@@ -32,7 +32,7 @@ round_votes_gained={
 
 round_inactive_votes=(671, 405, 773, 2903, 2053, 14465, 30653, 65404)
 
-def ed_to_gis_name(ad):
+def ed_to_gis_id(ad):
     return lambda x: int(ad)*1000 + int(x.split(' ')[1])
 
 previous_eliminiated = {}
@@ -43,7 +43,7 @@ for ad_n in range(23, 88):
     ad = ad[0]
     ad.drop(index=ad.tail(1).index, inplace=True)
     ad.rename(ad.iloc[:, 0], inplace=True)
-    ad.rename(index=ed_to_gis_name(ad_n), inplace=True)
+    ad.rename(index=ed_to_gis_id(ad_n), inplace=True)
     ad.dropna(axis=1, inplace=True)
     ad.drop(columns=ad.columns[[0, 1]], inplace=True)
     all_eds = pd.concat([all_eds, ad])
@@ -71,17 +71,18 @@ for round_number in range(number_rounds):
 
     plt.clf()
     fig, ax = plt.subplots(figsize=(15, 10))
-    divider = make_axes_locatable(ax)
     ax.axis("off")
+    inset_axis = ax.inset_axes([0.1, 0.6, 0.35, 0.40])
+    inset_axis.axis('off')
+    divider = make_axes_locatable(inset_axis)
     fig.suptitle(f'Round {round_number+1}\n{", ".join(eliminated)} eliminated')
 
-    for party, color in color_map.items():
-        cax = divider.append_axes('right', size='2%', pad=0.6)
-        cax.set_xlabel(party)
+    for party, color in reversed(list(color_map.items())):
         if len(round_map[round_map.winning_party == party])==0:
             continue
+        cax = divider.append_axes('left', size='5%', pad=0.6)
+        cax.set_xlabel(party)
         round_map[round_map.winning_party == party].plot(column='margin', cmap=color,
                                             legend=True, ax=ax, cax=cax, vmin=0.19, vmax=1.0, legend_kwds={'orientation': 'vertical'})
 
-    plt.savefig(f'nyc_ed_{round_number}.png')
-
+    plt.savefig(f'nyc_rcv_{round_number+1}.png')
