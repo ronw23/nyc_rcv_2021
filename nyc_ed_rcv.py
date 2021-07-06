@@ -65,24 +65,25 @@ for round_number in range(number_rounds):
     all_eds[list(eliminated)] = 0
     previous_eliminiated.update({k: True for k in eliminated})
 
-    winners = all_eds.idxmax(axis=1).apply(lambda x: x.split(' ')[-1] if x in top_4 else 'Other')
+    winners = all_eds.idxmax(axis=1)
     margins = all_eds.max(axis=1)/all_eds.sum(axis=1)
     round_map = nyc_ed.join([winners.to_frame(name='winning_party'), margins.to_frame(name='margin')]).dropna()
 
     plt.clf()
-    fig, ax = plt.subplots(figsize=(15, 10))
+    fig, ax = plt.subplots(figsize=(10, 10))
     ax.axis("off")
-    inset_axis = ax.inset_axes([0.1, 0.6, 0.35, 0.40])
-    inset_axis.axis('off')
-    divider = make_axes_locatable(inset_axis)
     fig.suptitle(f'Round {round_number+1}\n{", ".join(eliminated)} eliminated')
-
-    for party, color in reversed(list(color_map.items())):
+    total_round_votes = all_eds.sum().sum()
+    for n, party in enumerate(top_4 + ('Others',)):
         if len(round_map[round_map.winning_party == party])==0:
             continue
-        cax = divider.append_axes('left', size='5%', pad=0.6)
-        cax.set_xlabel(party)
-        round_map[round_map.winning_party == party].plot(column='margin', cmap=color,
+        cax = fig.add_axes((0.05+n*0.0750, 0.65, 0.025, 0.25))
+        party_votes = all_eds[party].sum().sum()
+        party_label = party.split(' ')[-1] if party in top_4 else 'Other'
+        party_plurality = party_votes/total_round_votes*100
+        cax.set_xlabel(f'{party_label}\n({party_plurality:.2f}%)')
+        round_map[round_map.winning_party == party].plot(column='margin', cmap=color_map[party_label],
                                             legend=True, ax=ax, cax=cax, vmin=0.19, vmax=1.0, legend_kwds={'orientation': 'vertical'})
 
+    fig.subplots_adjust(0.0, 0.0, 1, 1)
     plt.savefig(f'nyc_rcv_{round_number+1}.png')
