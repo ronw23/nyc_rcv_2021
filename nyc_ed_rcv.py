@@ -50,6 +50,8 @@ for ad_n in range(23, 88):
 
 nyc_ed = geopandas.read_file('nyed_21b/nyed.shp')
 nyc_ed.rename(nyc_ed.iloc[:, 0], inplace=True)
+nyc_ad = geopandas.read_file('nyad_21b/nyad.shp')
+
 
 number_rounds = max([len(v) for v in round_votes_gained.values()])
 for round_number in range(number_rounds):
@@ -71,6 +73,7 @@ for round_number in range(number_rounds):
 
     plt.clf()
     fig, ax = plt.subplots(figsize=(10, 10))
+    nyc_ad.plot(ax=ax, legend=False, facecolor="none", edgecolor="0.0", linewidth=0.25)
     ax.axis("off")
     fig.suptitle(f'Round {round_number+1}\n{", ".join(eliminated)} eliminated')
     total_round_votes = all_eds.sum().sum()
