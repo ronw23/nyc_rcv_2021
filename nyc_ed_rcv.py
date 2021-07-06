@@ -65,7 +65,7 @@ for round_number in range(number_rounds):
     all_eds[list(eliminated)] = 0
     previous_eliminiated.update({k: True for k in eliminated})
 
-    winners = all_eds.idxmax(axis=1)
+    winners = all_eds.idxmax(axis=1).apply(lambda x: 'Other' if x not in top_4 else x)
     margins = all_eds.max(axis=1)/all_eds.sum(axis=1)
     round_map = nyc_ed.join([winners.to_frame(name='winning_party'), margins.to_frame(name='margin')]).dropna()
 
@@ -74,11 +74,14 @@ for round_number in range(number_rounds):
     ax.axis("off")
     fig.suptitle(f'Round {round_number+1}\n{", ".join(eliminated)} eliminated')
     total_round_votes = all_eds.sum().sum()
-    for n, party in enumerate(top_4 + ('Others',)):
-        if len(round_map[round_map.winning_party == party])==0:
+    for n, party in enumerate(top_4 + ('Other',)):
+        if party == 'Other':
+            party_votes = all_eds[list(set(round_votes_gained)-set(previous_eliminiated)-set(top_4))].sum().sum()
+        else: 
+            party_votes = all_eds[party].sum().sum()
+        if party_votes==0:
             continue
         cax = fig.add_axes((0.05+n*0.0750, 0.65, 0.025, 0.25))
-        party_votes = all_eds[party].sum().sum()
         party_label = party.split(' ')[-1] if party in top_4 else 'Other'
         party_plurality = party_votes/total_round_votes*100
         cax.set_xlabel(f'{party_label}\n({party_plurality:.2f}%)')
