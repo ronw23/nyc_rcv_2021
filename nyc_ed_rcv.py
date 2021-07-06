@@ -90,6 +90,6 @@ for round_number in range(number_rounds):
         round_map[round_map.winning_party == party].plot(column='margin', cmap=color_map[party_label],
                                             legend=True, ax=ax, cax=cax, vmin=0.19, vmax=1.0, legend_kwds={'orientation': 'vertical'})
 
-    nyc_bb.plot(ax=ax, legend=False, facecolor="none", edgecolor="0.0", linewidth=0.25)
+    nyc_bb.plot(ax=ax, legend=False, facecolor="none", edgecolor="0.0", linewidth=0.5)
     fig.subplots_adjust(0.0, 0.0, 1, 1)
     plt.savefig(f'nyc_rcv_{round_number+1}.png')
