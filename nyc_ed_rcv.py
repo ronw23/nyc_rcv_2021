@@ -15,22 +15,39 @@ color_map = {
 }
 
 round_votes_gained={
-    'Eric L. Adams':(174, 413, 490, 1077, 3096, 87959, 49669),
-    'Maya D. Wiley':(58, 297, 1952, 2104, 2529, 64564),
-    'Kathryn A. Garcia':(97, 87, 541, 1280, 4169, 101066, 129446),
-    'Andrew Yang':(147, 179, 434, 1720, 2622),
-    'Scott M. Stringer':(58, 89, 288, 1155, 2259),
-    'Dianne Morales':(35, 98, 707, 2460, 632),
-    'Raymond J. McGuire':(27, 136, 157, 667, 1184),
-    'Shaun Donovan':(18, 104, 160, 452),
-    'Aaron S. Foldenauer':(15, 54, 107),
-    'Art Chang':(10, 26, 412),
-    'Paperboy Love Prince':(35, 45),
-    'Joycelyn Taylor':(18, 77),
-    'Isaac Wright Jr.':(11,),
+    'Eric L. Adams':        (200, 450, 1743, 3983, 21204, 37430, 49669),
+    'Maya D. Wiley':        (66, 323, 4461, 3081, 29912, 15473, ),
+    'Kathryn A. Garcia':    (108, 96, 2056, 5120, 31576, 43072, 129446),
+    'Andrew Yang':          (171, 201, 2502, 3572, 14011,),
+    'Scott M. Stringer':    (72, 101, 1644, 3114, ),
+    'Dianne Morales':       (39, 111, 3508, 771, ),
+    'Raymond J. McGuire':   (30, 146, 937, 1565,),
+    'Shaun Donovan':        (22, 125, 724,),
+    'Aaron S. Foldenauer':  (16, 61,),
+    'Art Chang':            (16, 29,),
+    'Paperboy Love Prince': (43, 53,),
+    'Joycelyn Taylor':      (21, 97,),
+    'Isaac Wright Jr.':     (12,)
 }
 
-round_inactive_votes=(671, 405, 773, 2903, 2053, 58675, 73979)
+initial_votes = {
+    'Eric L. Adams':288654,
+    'Maya D. Wiley':199778,
+    'Kathryn A. Garcia':183433,
+    'Andrew Yang':114639,
+    'Scott M. Stringer':51534,
+    'Dianne Morales':26374,
+    'Raymond J. McGuire':25074,
+    'Shaun Donovan':23074,
+    'Aaron S. Foldenauer':7729,
+    'Art Chang':7023,
+    'Paperboy Love Prince':	3934,
+    'Joycelyn Taylor':	2652,
+    'Isaac Wright Jr.':	2234,
+    'WRITE-IN':1567
+}
+
+round_inactive_votes=(751, 453, 4099, 2739, 18317, 39121, 73979)
 
 def ed_to_gis_id(ad):
     return lambda x: int(ad)*1000 + int(x.split(' ')[1])
@@ -52,6 +69,10 @@ nyc_ed = geopandas.read_file('nyed_21b/nyed.shp')
 nyc_ed.rename(nyc_ed.iloc[:, 0], inplace=True)
 nyc_bb = geopandas.read_file('nybb_21b/nybb.shp')
 eliminated = None
+
+# Scale foctor to closer align our final results with unofficial numbers
+for k, v in initial_votes.items():
+    all_eds[k] *= sum(initial_votes.values())/all_eds[k].sum()*v
 
 number_rounds = max([len(v) for v in round_votes_gained.values()])
 for round_number in range(-1, number_rounds):
